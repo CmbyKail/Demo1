@@ -1,0 +1,60 @@
+/* css/skills.css - 技能模块专用样式 */
+
+/* 技能卡片网格 */
+.skills-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+.skill-card {
+  background: var(--card-bg);
+  border-radius: 16px;
+  padding: 1.5rem;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+}
+
+.skill-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 20px rgba(0,0,0,0.12);
+}
+
+.skill-icon {
+  font-size: 2.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.skill-name {
+  font-weight: bold;
+  margin-bottom: 0.5rem;
+  color: var(--text-color);
+}
+
+.skill-level {
+  font-size: 0.85rem;
+  color: var(--accent-color);
+  margin-bottom: 0.5rem;
+}
+
+.skill-progress {
+  height: 6px;
+  background: #eee;
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.skill-progress-fill {
+  height: 100%;
+  border-radius: 3px;
+  transition: width 0.5s ease;
+}
+
+/* 技能专属进度条颜色 */
+.skill-humor .skill-progress-fill { background: linear-gradient(90deg, #FF9800, #FFC107); }
+.skill-retaliation .skill-progress-fill { background: linear-gradient(90deg, #E91E63, #9C27B0); }
+.skill-influence .skill-progress-fill { background: linear-gradient(90deg, #2196F3, #00BCD4); }
+.skill-antipua .skill-progress-fill { background: linear-gradient(90deg, #4CAF50, #009688); }
