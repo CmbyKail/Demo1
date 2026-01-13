@@ -170,6 +170,87 @@
   box-shadow: var(--shadow-float);
 }
 
+/* Practice Container */
+.practice-container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: var(--space-lg);
+}
+
+.exercise-type-badge {
+  display: inline-block;
+  padding: 0.25rem 0.75rem;
+  background: var(--leaf);
+  color: white;
+  border-radius: var(--round);
+  font-size: 0.85rem;
+}
+
+.exercise-input {
+  width: 100%;
+  min-height: 120px;
+  padding: var(--space-md);
+  border: 2px solid #ddd;
+  border-radius: var(--round);
+  font-family: inherit;
+  font-size: 1rem;
+  resize: vertical;
+  transition: border-color 0.3s ease;
+}
+
+.exercise-input:focus {
+  outline: none;
+  border-color: var(--leaf);
+}
+
+.feedback-card {
+  background: white;
+  border-radius: var(--round);
+  padding: var(--space-lg);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+.feedback-score {
+  text-align: center;
+  margin-bottom: var(--space-lg);
+  padding-bottom: var(--space-lg);
+  border-bottom: 2px solid var(--dew-drop);
+}
+
+.score-number {
+  font-size: 3rem;
+  font-weight: bold;
+  color: var(--leaf);
+}
+
+.feedback-highlights {
+  color: var(--leaf);
+  margin-bottom: var(--space-md);
+}
+
+.feedback-highlights ul {
+  margin: 0;
+  padding-left: var(--space-lg);
+}
+
+.feedback-suggestions {
+  color: var(--energy-primary);
+  margin-bottom: var(--space-md);
+}
+
+.feedback-suggestions ul {
+  margin: 0;
+  padding-left: var(--space-lg);
+}
+
+.feedback-example {
+  background: var(--mist-white);
+  padding: var(--space-md);
+  border-radius: var(--round);
+  border-left: 4px solid var(--leaf);
+  margin-top: var(--space-md);
+}
+
 /* Scenarios List */
 .scenarios-list {
   display: flex;

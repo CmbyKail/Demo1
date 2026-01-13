@@ -5,6 +5,7 @@
  * 负责渲染技能模块相关的所有界面
  */
 import { skillManager } from './SkillModuleManager.js';
+import { PracticeEngine } from './PracticeEngine.js';
 
 class SkillModuleRenderer {
   constructor() {
@@ -533,8 +534,8 @@ class SkillModuleRenderer {
       </div>
     `;
 
-    // 附加练习点击事件（占位）
-    // TODO: Task 5 实现具体的练习逻辑
+    // 附加练习点击事件
+    this.attachExerciseClickEvents(moduleId);
   }
 
   /**
@@ -544,12 +545,53 @@ class SkillModuleRenderer {
    */
   getExerciseTypeLabel(type) {
     const labels = {
-      'quiz': '📝 选择题',
+      'complete_sentence': '📝 补全句子',
+      'rewrite': '✍️ 改写',
       'scenario': '💭 场景题',
+      'quiz': '📝 选择题',
       'reflection': '📝 反思题',
       'roleplay': '🎭 角色扮演'
     };
     return labels[type] || '📝 练习';
+  }
+
+  /**
+   * 附加练习点击事件
+   * @param {string} moduleId - 模块ID
+   */
+  attachExerciseClickEvents(moduleId) {
+    const tabContent = document.getElementById('tab-content');
+    if (!tabContent) return;
+
+    // 使用事件委托处理练习点击
+    tabContent.addEventListener('click', (e) => {
+      const exerciseItem = e.target.closest('.exercise-item');
+      if (exerciseItem) {
+        const exerciseId = exerciseItem.dataset.exerciseId;
+        if (exerciseId) {
+          this.startPractice(moduleId, exerciseId);
+        }
+      }
+    });
+  }
+
+  /**
+   * 开始练习
+   * @param {string} moduleId - 模块ID
+   * @param {string} exerciseId - 练习ID
+   */
+  startPractice(moduleId, exerciseId) {
+    try {
+      // 创建练习引擎实例
+      const practiceEngine = new PracticeEngine(moduleId);
+
+      // 启动练习
+      practiceEngine.startExercise(exerciseId);
+
+    } catch (error) {
+      console.error('Start practice error:', error);
+      this.showToast('启动练习失败：' + error.message, 'error');
+    }
   }
 
   /**
