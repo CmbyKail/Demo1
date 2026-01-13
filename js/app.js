@@ -6,6 +6,7 @@ import { Gamification } from './gamification.js';
 
 // 技能模块
 import { skillManager } from './modules/skills/SkillModuleManager.js';
+import { SkillModuleRenderer } from './modules/skills/SkillModuleRenderer.js';
 // import { HumorModule } from './modules/skills/HumorModule.js'; // TODO: Task 6创建后启用
 
 // DOM Elements
@@ -84,6 +85,7 @@ async function init() {
     renderStats();
     renderRecommendation();
     setupDailyChallenge();
+    initSkillModules();
     bindEvents();
 }
 
@@ -838,6 +840,23 @@ function renderRecommendation() {
              startTimer();
              switchView('training');
         };
+    }
+}
+
+/**
+ * 初始化技能模块
+ * 在欢迎页面的类别列表后插入技能卡片
+ */
+async function initSkillModules() {
+    const renderer = new SkillModuleRenderer();
+
+    // 在欢迎页面的类别列表后插入技能卡片
+    const categoryList = document.getElementById('category-list');
+    if (categoryList) {
+        const skillsSection = document.createElement('div');
+        skillsSection.id = 'skills-section';
+        categoryList.after(skillsSection);
+        renderer.renderSkillCards(skillsSection);
     }
 }
 
