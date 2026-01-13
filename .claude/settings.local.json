@@ -7,7 +7,9 @@
       "mcp__plugin_serena_serena__read_file",
       "mcp__plugin_serena_serena__search_for_pattern",
       "Skill(superpowers:using-git-worktrees)",
-      "Skill(superpowers:writing-plans)"
+      "Skill(superpowers:writing-plans)",
+      "Skill(superpowers:subagent-driven-development)",
+      "Skill(superpowers:finishing-a-development-branch)"
     ]
   }
 }

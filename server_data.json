@@ -88,17 +88,19 @@
           "id": "humor_scenario_01",
           "title": "聚会破冰",
           "description": "你在朋友的聚会上，周围都是陌生人。用幽默的方式主动打破尴尬，让大家放松下来。",
-          "role": "一群陌生人，有的在玩手机，有的尴尬地微笑",
+          "role": "聚会上的陌生人",
           "goal": "说1-2句话让大家笑，并打开话匣子",
-          "difficulty": "简单"
+          "difficulty": "简单",
+          "openingLine": "你好啊，你是怎么认识[朋友名字]的？"
         },
         {
           "id": "humor_scenario_02",
           "title": "化解尴尬",
           "description": "你在会议上说错话了，全场突然安静。用幽默的方式自救。",
-          "role": "老板和同事都在看你",
+          "role": "老板和同事",
           "goal": "用一个玩笑让大家放松，同时承认自己的失误",
-          "difficulty": "中等"
+          "difficulty": "中等",
+          "openingLine": "呃...你刚才说的是...？"
         }
       ]
     },

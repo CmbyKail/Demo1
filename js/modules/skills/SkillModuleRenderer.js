@@ -6,6 +6,7 @@
  */
 import { skillManager } from './SkillModuleManager.js';
 import { PracticeEngine } from './PracticeEngine.js';
+import { DialogueEngine } from './DialogueEngine.js';
 
 class SkillModuleRenderer {
   constructor() {
@@ -371,6 +372,28 @@ class SkillModuleRenderer {
         }
         return;
       }
+
+      // 处理练习题目点击
+      const exerciseItem = e.target.closest('.exercise-item');
+      if (exerciseItem) {
+        e.preventDefault();
+        const exerciseId = exerciseItem.dataset.exerciseId;
+        if (exerciseId) {
+          this.startExercise(moduleId, exerciseId);
+        }
+        return;
+      }
+
+      // 处理场景点击
+      const scenarioItem = e.target.closest('.scenario-item');
+      if (scenarioItem) {
+        e.preventDefault();
+        const scenarioId = scenarioItem.dataset.scenarioId;
+        if (scenarioId) {
+          this.startScenario(moduleId, scenarioId);
+        }
+        return;
+      }
     };
 
     // 保存并绑定事件委托器
@@ -659,7 +682,51 @@ class SkillModuleRenderer {
     `;
 
     // 附加场景点击事件（占位）
-    // TODO: Task 5 实现具体的场景实战逻辑
+    // 事件已通过事件委托在 attachModuleViewEvents 中处理
+  }
+
+  /**
+   * 13. 启动练习
+   * @param {string} moduleId - 模块ID
+   * @param {string} exerciseId - 练习ID
+   */
+  startExercise(moduleId, exerciseId) {
+    const tabContent = document.getElementById('tab-content');
+    if (!tabContent) return;
+
+    // 创建练习引擎实例
+    const engine = new PracticeEngine(moduleId);
+    engine.container = tabContent;
+    engine.startExercise(exerciseId);
+  }
+
+  /**
+   * 14. 启动实战场景对话
+   * @param {string} moduleId - 模块ID
+   * @param {string} scenarioId - 场景ID
+   */
+  startScenario(moduleId, scenarioId) {
+    const tabContent = document.getElementById('tab-content');
+    if (!tabContent) return;
+
+    // 检查是否完成足够的练习（可选）
+    const progress = skillManager.getModuleProgress(moduleId);
+    const completedLessons = progress?.completedLessons?.length || 0;
+    const totalLessons = skillManager.getModule(moduleId)?.theoryLessons?.length || 0;
+
+    if (completedLessons < 1) {
+      this.showToast('建议先完成至少1个理论课', 'info');
+      // 仍然允许继续，只是给出提示
+    }
+
+    try {
+      // 创建对话引擎实例
+      const dialogueEngine = new DialogueEngine(moduleId, scenarioId);
+      dialogueEngine.initialize(tabContent);
+    } catch (error) {
+      console.error('Start scenario error:', error);
+      this.showToast('启动场景失败：' + error.message, 'error');
+    }
   }
 }
 
