@@ -10,6 +10,103 @@ class SkillModuleRenderer {
   constructor() {
     this.currentModule = null;
     this.currentTab = 'theory';
+    this.eventDelegators = new Map(); // 存储事件委托处理器，用于清理
+  }
+
+  /**
+   * 显示Toast提示消息
+   * @param {string} message - 消息内容
+   * @param {string} type - 消息类型 ('success', 'error', 'info')
+   */
+  showToast(message, type = 'info') {
+    // 移除已存在的toast
+    const existingToast = document.querySelector('.toast');
+    if (existingToast) {
+      existingToast.remove();
+    }
+
+    const toast = document.createElement('div');
+    toast.className = `toast toast-${type}`;
+
+    // 根据类型设置图标
+    const icons = {
+      success: '✓',
+      error: '✕',
+      info: 'ℹ'
+    };
+
+    toast.innerHTML = `
+      <span style="margin-right: 8px;">${icons[type] || icons.info}</span>
+      <span>${message}</span>
+    `;
+
+    toast.style.cssText = `
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background: ${type === 'error' ? '#ff7675' : type === 'success' ? '#00b894' : '#0984e3'};
+      color: white;
+      padding: 1rem 1.5rem;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      z-index: 9999;
+      display: flex;
+      align-items: center;
+      font-size: 0.95rem;
+      animation: slideIn 0.3s ease, fadeOut 0.3s ease 2.7s forwards;
+      max-width: 400px;
+    `;
+
+    // 添加动画样式
+    if (!document.querySelector('#toast-animations')) {
+      const style = document.createElement('style');
+      style.id = 'toast-animations';
+      style.textContent = `
+        @keyframes slideIn {
+          from {
+            transform: translateX(100%);
+            opacity: 0;
+          }
+          to {
+            transform: translateX(0);
+            opacity: 1;
+          }
+        }
+        @keyframes fadeOut {
+          from {
+            opacity: 1;
+          }
+          to {
+            opacity: 0;
+          }
+        }
+      `;
+      document.head.appendChild(style);
+    }
+
+    document.body.appendChild(toast);
+
+    // 3秒后自动移除
+    setTimeout(() => {
+      if (toast.parentElement) {
+        toast.remove();
+      }
+    }, 3000);
+  }
+
+  /**
+   * HTML转义函数，防止XSS攻击
+   * @param {string} unsafe - 未转义的字符串
+   * @returns {string} 转义后的安全字符串
+   */
+  escapeHtml(unsafe) {
+    if (typeof unsafe !== 'string') return unsafe;
+    return unsafe
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#039;");
   }
 
   /**
@@ -161,7 +258,7 @@ class SkillModuleRenderer {
         </div>
 
         <!-- Tab Navigation -->
-        <div class="tab-navigation" style="display:flex;gap:var(--space-sm);border-bottom:2px solid #eee;margin-top:var(--space-lg);">
+        <div id="tab-navigation" style="display:flex;gap:var(--space-sm);border-bottom:2px solid #eee;margin-top:var(--space-lg);">
           <button class="tab-btn active" data-tab="theory">
             📚 理论课
           </button>
@@ -180,39 +277,53 @@ class SkillModuleRenderer {
       </div>
     `;
 
-    // 附加返回按钮事件
-    document.getElementById('back-to-skills-btn').addEventListener('click', () => {
-      if (typeof switchView === 'function') {
-        switchView('welcome');
-      }
-    });
-
-    // 附加Tab事件
-    this.attachTabEvents(module.id);
+    // 使用事件委托处理模块视图内所有点击事件
+    this.attachModuleViewEvents(module.id);
 
     // 默认渲染理论课Tab
     this.renderTheoryTab(module.id);
   }
 
   /**
-   * 6. 附加Tab切换事件
+   * 6. 统一的事件委托处理方法
+   * 使用事件委托避免内存泄漏，在模块视图上只绑定一次事件
    * @param {string} moduleId - 模块ID
    */
-  attachTabEvents(moduleId) {
-    const tabButtons = document.querySelectorAll('.tab-btn');
-    const tabContent = document.getElementById('tab-content');
+  attachModuleViewEvents(moduleId) {
+    const moduleView = document.getElementById('skill-module-view');
+    if (!moduleView) return;
 
-    tabButtons.forEach(btn => {
-      btn.addEventListener('click', () => {
+    // 清理旧的事件委托器
+    if (this.eventDelegators.has('moduleView')) {
+      moduleView.removeEventListener('click', this.eventDelegators.get('moduleView'));
+    }
+
+    // 创建新的事件委托处理器
+    const delegator = (e) => {
+      // 处理返回按钮
+      if (e.target.closest('#back-to-skills-btn')) {
+        e.preventDefault();
+        if (typeof switchView === 'function') {
+          switchView('welcome');
+        }
+        return;
+      }
+
+      // 处理Tab切换
+      const tabBtn = e.target.closest('.tab-btn');
+      if (tabBtn) {
+        e.preventDefault();
+        const tab = tabBtn.dataset.tab;
+
         // 更新按钮状态
-        tabButtons.forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        tabBtn.classList.add('active');
 
         // 更新当前Tab
-        this.currentTab = btn.dataset.tab;
+        this.currentTab = tab;
 
         // 渲染对应内容
-        switch (this.currentTab) {
+        switch (tab) {
           case 'theory':
             this.renderTheoryTab(moduleId);
             break;
@@ -223,8 +334,47 @@ class SkillModuleRenderer {
             this.renderRealWorldTab(moduleId);
             break;
         }
-      });
-    });
+        return;
+      }
+
+      // 处理课程点击
+      const lessonItem = e.target.closest('.lesson-item');
+      if (lessonItem) {
+        e.preventDefault();
+        if (lessonItem.classList.contains('locked')) {
+          this.showToast('请先完成前面的课程', 'error');
+          return;
+        }
+
+        const lessonId = lessonItem.dataset.lessonId;
+        this.showLessonContent(moduleId, lessonId);
+        return;
+      }
+
+      // 处理返回课程列表按钮
+      if (e.target.closest('#back-to-lessons-btn')) {
+        e.preventDefault();
+        this.renderTheoryTab(moduleId);
+        return;
+      }
+
+      // 处理完成课程按钮
+      if (e.target.closest('#complete-lesson-btn')) {
+        e.preventDefault();
+        const lessonId = e.target.closest('#complete-lesson-btn').dataset.lessonId;
+        if (lessonId) {
+          skillManager.completeLesson(moduleId, lessonId);
+          this.showToast('课程完成！+50 XP', 'success');
+          this.renderTheoryTab(moduleId);
+          this.renderSkillModuleInterface(this.currentModule);
+        }
+        return;
+      }
+    };
+
+    // 保存并绑定事件委托器
+    this.eventDelegators.set('moduleView', delegator);
+    moduleView.addEventListener('click', delegator);
   }
 
   /**
@@ -280,33 +430,10 @@ class SkillModuleRenderer {
         }).join('')}
       </div>
     `;
-
-    // 附加课程点击事件
-    this.attachLessonEvents(moduleId);
   }
 
   /**
-   * 8. 附加课程点击事件
-   * @param {string} moduleId - 模块ID
-   */
-  attachLessonEvents(moduleId) {
-    const lessonItems = document.querySelectorAll('.lesson-item');
-
-    lessonItems.forEach(item => {
-      item.addEventListener('click', () => {
-        if (item.classList.contains('locked')) {
-          alert('请先完成前面的课程');
-          return;
-        }
-
-        const lessonId = item.dataset.lessonId;
-        this.showLessonContent(moduleId, lessonId);
-      });
-    });
-  }
-
-  /**
-   * 9. 显示课程内容
+   * 8. 显示课程内容
    * @param {string} moduleId - 模块ID
    * @param {string} lessonId - 课程ID
    */
@@ -326,11 +453,16 @@ class SkillModuleRenderer {
           ← 返回课程列表
         </button>
 
-        <h2 style="margin-bottom:var(--space-md);">${lesson.title}</h2>
+        <h2 style="margin-bottom:var(--space-md);">${this.escapeHtml(lesson.title)}</h2>
         <p style="color:var(--ink-light);margin-bottom:var(--space-lg);">
-          ⏱️ ${lesson.duration || '10'} 分钟
+          ⏱️ ${this.escapeHtml(lesson.duration || '10')} 分钟
         </p>
 
+        <!--
+          安全说明: lesson.content 来自受信任的静态数据源 (server_data.json)
+          这些内容由项目维护者在配置文件中预先定义，不包含用户生成的内容。
+          如果将来支持用户生成内容或动态内容，必须使用 DOMPurify 或类似库进行HTML清理。
+        -->
         <div class="lesson-body" style="line-height:1.8;color:var(--ink-dark);">
           ${lesson.content || '<p>课程内容正在更新中...</p>'}
         </div>
@@ -339,37 +471,21 @@ class SkillModuleRenderer {
           <div style="margin-top:var(--space-lg);padding:var(--space-lg);background:var(--dew-drop);border-radius:var(--round-md);border-left:4px solid var(--sky-blue);">
             <h4 style="margin-top:0;">🎯 核心要点</h4>
             <ul>
-              ${lesson.keyPoints.map(point => `<li>${point}</li>`).join('')}
+              ${lesson.keyPoints.map(point => `<li>${this.escapeHtml(point)}</li>`).join('')}
             </ul>
           </div>
         ` : ''}
 
         <div style="margin-top:var(--space-xl);text-align:center;">
-          <button id="complete-lesson-btn" class="primary-btn">
+          <button id="complete-lesson-btn" class="primary-btn" data-lesson-id="${lessonId}">
             ✓ 完成课程 (+50 XP)
           </button>
         </div>
       </div>
     `;
 
-    // 返回按钮事件
-    document.getElementById('back-to-lessons-btn').addEventListener('click', () => {
-      this.renderTheoryTab(moduleId);
-    });
-
-    // 完成课程事件
-    document.getElementById('complete-lesson-btn').addEventListener('click', () => {
-      skillManager.completeLesson(moduleId, lessonId);
-
-      // 显示完成提示
-      alert(`🎉 课程完成！+50 XP`);
-
-      // 返回课程列表
-      this.renderTheoryTab(moduleId);
-
-      // 刷新整个模块界面以更新进度
-      this.renderSkillModuleInterface(this.currentModule);
-    });
+    // 注意: 所有按钮事件通过 attachModuleViewEvents 中的事件委托处理
+    // 不需要单独绑定事件监听器，避免内存泄漏
   }
 
   /**
@@ -400,17 +516,17 @@ class SkillModuleRenderer {
         <h3 style="margin-bottom:var(--space-lg);">练习列表</h3>
         ${exercises.map(exercise => `
           <div class="exercise-item clay-card"
-               data-exercise-id="${exercise.id}"
+               data-exercise-id="${this.escapeHtml(exercise.id)}"
                style="padding:var(--space-lg);cursor:pointer;margin-bottom:var(--space-md);">
             <div style="display:flex;align-items:center;gap:var(--space-md);margin-bottom:var(--space-sm);">
-              <span class="tag">${this.getExerciseTypeLabel(exercise.type)}</span>
+              <span class="tag">${this.escapeHtml(this.getExerciseTypeLabel(exercise.type))}</span>
               <span style="color:var(--ink-light);font-size:0.85rem;">
                 难度: ${'⭐'.repeat(exercise.difficulty || 1)}
               </span>
             </div>
-            <h4 style="margin-bottom:var(--space-xs);">${exercise.title}</h4>
+            <h4 style="margin-bottom:var(--space-xs);">${this.escapeHtml(exercise.title)}</h4>
             <p style="color:var(--ink-light);font-size:0.9rem;">
-              ${exercise.description || '点击开始练习'}
+              ${this.escapeHtml(exercise.description || '点击开始练习')}
             </p>
           </div>
         `).join('')}
@@ -482,15 +598,15 @@ class SkillModuleRenderer {
             ${scenarios.map(scenario => `
               <div class="scenario-item clay-card"
                    style="padding:var(--space-lg);cursor:pointer;margin-bottom:var(--space-md);"
-                   data-scenario-id="${scenario.id}">
-                <h4 style="margin-bottom:var(--space-xs);">${scenario.title}</h4>
+                   data-scenario-id="${this.escapeHtml(scenario.id)}">
+                <h4 style="margin-bottom:var(--space-xs);">${this.escapeHtml(scenario.title)}</h4>
                 <p style="color:var(--ink-light);font-size:0.9rem;">
-                  ${scenario.description}
+                  ${this.escapeHtml(scenario.description)}
                 </p>
                 <div style="margin-top:var(--space-sm);display:flex;gap:var(--space-xs);">
-                  <span class="tag" style="font-size:0.75rem;">${scenario.category || '通用'}</span>
+                  <span class="tag" style="font-size:0.75rem;">${this.escapeHtml(scenario.category || '通用')}</span>
                   <span style="color:var(--ink-light);font-size:0.85rem;">
-                    ${scenario.difficulty || '中等'}
+                    ${this.escapeHtml(scenario.difficulty || '中等')}
                   </span>
                 </div>
               </div>
