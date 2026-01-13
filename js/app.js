@@ -4,6 +4,10 @@ import { getHistory, getSettings, initStorage, isFavorite, saveCustomScenario, s
 import { Analytics } from './analytics.js';
 import { Gamification } from './gamification.js';
 
+// 技能模块
+import { SkillModuleManager } from './modules/skills/SkillModuleManager.js';
+// import { HumorModule } from './modules/skills/HumorModule.js'; // TODO: 待 Task 6 创建后启用
+
 // DOM Elements
 const views = {
     welcome: document.getElementById('welcome-view'),
@@ -340,7 +344,7 @@ function showHistoryDetail(index) {
 function switchView(viewName) {
     Object.values(views).forEach(el => el.classList.remove('active'));
     Object.values(views).forEach(el => el.classList.add('hidden'));
-    
+
     views[viewName].classList.remove('hidden');
     views[viewName].classList.add('active');
 
@@ -348,6 +352,33 @@ function switchView(viewName) {
         renderHistory();
         renderCategories();
         renderContributionGraph();
+    }
+}
+
+// 扩展路由系统 - 支持技能模块
+function showView(viewName, viewData = {}) {
+    // 首先尝试使用旧的 switchView 处理基础视图
+    if (views[viewName]) {
+        switchView(viewName);
+        return;
+    }
+
+    // 处理新的技能模块路由
+    switch (viewName) {
+        case 'skill-module':
+            showSkillModuleView(viewData.moduleId);
+            break;
+        case 'skill-theory':
+            showTheoryView(viewData.moduleId, viewData.lessonId);
+            break;
+        case 'skill-practice':
+            showPracticeView(viewData.moduleId, viewData.practiceType);
+            break;
+        case 'skill-realworld':
+            showRealWorldView(viewData.moduleId);
+            break;
+        default:
+            console.warn('Unknown view:', viewName);
     }
 }
 
@@ -807,6 +838,97 @@ function renderRecommendation() {
              switchView('training');
         };
     }
+}
+
+// ==================== 技能模块视图函数 ====================
+
+/**
+ * 显示技能模块主界面
+ * @param {string} moduleId - 模块ID (如 'humor')
+ */
+function showSkillModuleView(moduleId) {
+    const module = SkillModuleManager.getModule(moduleId);
+    if (!module) {
+        console.error('Module not found:', moduleId);
+        return;
+    }
+
+    // 渲染技能模块界面（将在 Task 4 实现具体的渲染逻辑）
+    renderSkillModuleInterface(module);
+}
+
+/**
+ * 显示理论课界面
+ * @param {string} moduleId - 模块ID
+ * @param {string} lessonId - 课程ID
+ */
+function showTheoryView(moduleId, lessonId) {
+    const lesson = SkillModuleManager.getLesson(moduleId, lessonId);
+    if (!lesson) {
+        console.error('Lesson not found:', moduleId, lessonId);
+        return;
+    }
+
+    // 渲染理论课界面（将在 Task 4 实现具体的渲染逻辑）
+    renderTheoryInterface(lesson);
+}
+
+/**
+ * 显示练习界面
+ * @param {string} moduleId - 模块ID
+ * @param {string} practiceType - 练习类型 ('quiz', 'scenario', 'reflection')
+ */
+function showPracticeView(moduleId, practiceType) {
+    // 渲染练习界面（将在 Task 4 实现具体的渲染逻辑）
+    renderPracticeInterface(moduleId, practiceType);
+}
+
+/**
+ * 显示实战界面
+ * @param {string} moduleId - 模块ID
+ */
+function showRealWorldView(moduleId) {
+    // 渲染实战界面（将在 Task 4 实现具体的渲染逻辑）
+    renderRealWorldInterface(moduleId);
+}
+
+// ==================== 技能模块渲染函数（占位符，Task 4 实现）====================
+
+/**
+ * 渲染技能模块主界面
+ * TODO: Task 4 - 实现具体的DOM渲染逻辑
+ */
+function renderSkillModuleInterface(module) {
+    console.log('Rendering skill module interface for:', module.id);
+    // Task 4 将实现完整的UI渲染
+    // 目前先输出日志作为占位符
+}
+
+/**
+ * 渲染理论课界面
+ * TODO: Task 4 - 实现具体的DOM渲染逻辑
+ */
+function renderTheoryInterface(lesson) {
+    console.log('Rendering theory interface for lesson:', lesson.id);
+    // Task 4 将实现完整的UI渲染
+}
+
+/**
+ * 渲染练习界面
+ * TODO: Task 4 - 实现具体的DOM渲染逻辑
+ */
+function renderPracticeInterface(moduleId, practiceType) {
+    console.log('Rendering practice interface:', moduleId, practiceType);
+    // Task 4 将实现完整的UI渲染
+}
+
+/**
+ * 渲染实战界面
+ * TODO: Task 4 - 实现具体的DOM渲染逻辑
+ */
+function renderRealWorldInterface(moduleId) {
+    console.log('Rendering real-world interface:', moduleId);
+    // Task 4 将实现完整的UI渲染
 }
 
 // Initialize on load
