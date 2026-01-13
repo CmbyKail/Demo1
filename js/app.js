@@ -7,7 +7,7 @@ import { Gamification } from './gamification.js';
 // 技能模块
 import { skillManager } from './modules/skills/SkillModuleManager.js';
 import { skillRenderer } from './modules/skills/SkillModuleRenderer.js';
-// import { HumorModule } from './modules/skills/HumorModule.js'; // TODO: Task 6创建后启用
+import { HumorModule } from './modules/skills/HumorModule.js';
 
 // DOM Elements
 const views = {
