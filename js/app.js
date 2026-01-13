@@ -5,7 +5,7 @@ import { Analytics } from './analytics.js';
 import { Gamification } from './gamification.js';
 
 // 技能模块
-// import { SkillModuleManager } from './modules/skills/SkillModuleManager.js'; // TODO: Task 3创建
+import { SkillModuleManager } from './modules/skills/SkillModuleManager.js';
 // import { HumorModule } from './modules/skills/HumorModule.js'; // TODO: Task 6创建后启用
 
 // DOM Elements
@@ -847,9 +847,14 @@ function renderRecommendation() {
  * @param {string} moduleId - 模块ID (如 'humor')
  */
 function showSkillModuleView(moduleId) {
-    // TODO: Task 3 - 等待SkillModuleManager创建
-    console.log('showSkillModuleView called with moduleId:', moduleId);
-    alert('技能模块功能开发中... (Task 3完成)');
+    const module = SkillModuleManager.getModule(moduleId);
+    if (!module) {
+        console.error('Module not found:', moduleId);
+        return;
+    }
+
+    // 渲染技能模块界面（Task 4实现）
+    renderSkillModuleInterface(module);
 }
 
 /**
@@ -858,9 +863,11 @@ function showSkillModuleView(moduleId) {
  * @param {string} lessonId - 课程ID
  */
 function showTheoryView(moduleId, lessonId) {
-    // TODO: Task 3 - 等待SkillModuleManager创建
-    console.log('showTheoryView called with moduleId:', moduleId, 'lessonId:', lessonId);
-    alert('理论课功能开发中... (Task 3完成)');
+    const lesson = SkillModuleManager.getLesson(moduleId, lessonId);
+    if (!lesson) return;
+
+    // 渲染理论课界面（Task 4实现）
+    renderTheoryInterface(lesson);
 }
 
 /**
@@ -869,9 +876,8 @@ function showTheoryView(moduleId, lessonId) {
  * @param {string} practiceType - 练习类型 ('quiz', 'scenario', 'reflection')
  */
 function showPracticeView(moduleId, practiceType) {
-    // TODO: Task 3 - 等待SkillModuleManager创建
-    console.log('showPracticeView called with moduleId:', moduleId, 'practiceType:', practiceType);
-    alert('练习功能开发中... (Task 3完成)');
+    // 渲染练习界面（Task 4实现）
+    renderPracticeInterface(moduleId, practiceType);
 }
 
 /**
@@ -879,9 +885,8 @@ function showPracticeView(moduleId, practiceType) {
  * @param {string} moduleId - 模块ID
  */
 function showRealWorldView(moduleId) {
-    // TODO: Task 3 - 等待SkillModuleManager创建
-    console.log('showRealWorldView called with moduleId:', moduleId);
-    alert('实战功能开发中... (Task 3完成)');
+    // 渲染实战界面（Task 4实现）
+    renderRealWorldInterface(moduleId);
 }
 
 // Initialize on load
