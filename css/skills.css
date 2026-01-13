@@ -9,7 +9,7 @@
 }
 
 .skill-card {
-  background: var(--card-bg);
+  background: white;
   border-radius: 16px;
   padding: 1.5rem;
   text-align: center;
@@ -31,12 +31,12 @@
 .skill-name {
   font-weight: bold;
   margin-bottom: 0.5rem;
-  color: var(--text-color);
+  color: var(--ink-dark);
 }
 
 .skill-level {
   font-size: 0.85rem;
-  color: var(--accent-color);
+  color: var(--leaf);
   margin-bottom: 0.5rem;
 }
 
@@ -57,4 +57,4 @@
 .skill-humor .skill-progress-fill { background: linear-gradient(90deg, #FF9800, #FFC107); }
 .skill-retaliation .skill-progress-fill { background: linear-gradient(90deg, #E91E63, #9C27B0); }
 .skill-influence .skill-progress-fill { background: linear-gradient(90deg, #2196F3, #00BCD4); }
-.skill-antipua .skill-progress-fill { background: linear-gradient(90deg, #4CAF50, #009688); }
+.skill-anti_pua .skill-progress-fill { background: linear-gradient(90deg, #4CAF50, #009688); }
