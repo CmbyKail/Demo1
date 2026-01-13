@@ -5,7 +5,7 @@ import { Analytics } from './analytics.js';
 import { Gamification } from './gamification.js';
 
 // 技能模块
-import { SkillModuleManager } from './modules/skills/SkillModuleManager.js';
+import { skillManager } from './modules/skills/SkillModuleManager.js';
 // import { HumorModule } from './modules/skills/HumorModule.js'; // TODO: Task 6创建后启用
 
 // DOM Elements
@@ -76,6 +76,7 @@ let chatHistory = [];
 // Initialization
 async function init() {
     await initStorage();
+    await skillManager.loadModules();
     renderCategories();
     renderHistory();
     renderContributionGraph();
@@ -847,7 +848,7 @@ function renderRecommendation() {
  * @param {string} moduleId - 模块ID (如 'humor')
  */
 function showSkillModuleView(moduleId) {
-    const module = SkillModuleManager.getModule(moduleId);
+    const module = skillManager.getModule(moduleId);
     if (!module) {
         console.error('Module not found:', moduleId);
         return;
@@ -863,7 +864,7 @@ function showSkillModuleView(moduleId) {
  * @param {string} lessonId - 课程ID
  */
 function showTheoryView(moduleId, lessonId) {
-    const lesson = SkillModuleManager.getLesson(moduleId, lessonId);
+    const lesson = skillManager.getLesson(moduleId, lessonId);
     if (!lesson) return;
 
     // 渲染理论课界面（Task 4实现）

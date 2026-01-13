@@ -95,6 +95,9 @@ class SkillModuleManager {
    * 标记课程为已完成
    */
   completeLesson(moduleId, lessonId) {
+    if (!this.progress[moduleId]) {
+      this.updateModuleProgress(moduleId, {});
+    }
     const progress = this.getModuleProgress(moduleId);
     if (progress && !progress.completedLessons.includes(lessonId)) {
       progress.completedLessons.push(lessonId);
@@ -114,9 +117,11 @@ class SkillModuleManager {
 
       // 计算平均分
       const scores = Object.values(progress.exerciseScores);
-      progress.averageScore = Math.round(
-        scores.reduce((a, b) => a + b, 0) / scores.length
-      );
+      if (scores.length > 0) {
+        progress.averageScore = Math.round(
+          scores.reduce((a, b) => a + b, 0) / scores.length
+        );
+      }
 
       this.saveProgress();
     }
