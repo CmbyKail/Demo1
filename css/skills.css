@@ -58,3 +58,129 @@
 .skill-retaliation .skill-progress-fill { background: linear-gradient(90deg, #E91E63, #9C27B0); }
 .skill-influence .skill-progress-fill { background: linear-gradient(90deg, #2196F3, #00BCD4); }
 .skill-anti_pua .skill-progress-fill { background: linear-gradient(90deg, #4CAF50, #009688); }
+
+/* Tab Navigation */
+.tab-navigation {
+  display: flex;
+  gap: var(--space-sm);
+  border-bottom: 2px solid #eee;
+  margin-top: var(--space-lg);
+}
+
+.tab-btn {
+  background: transparent;
+  border: none;
+  padding: var(--space-sm) var(--space-md);
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--ink-medium);
+  cursor: pointer;
+  border-bottom: 3px solid transparent;
+  transition: all 0.3s ease;
+  margin-bottom: -2px;
+}
+
+.tab-btn:hover {
+  color: var(--leaf);
+  background: rgba(76, 175, 80, 0.05);
+}
+
+.tab-btn.active {
+  color: var(--leaf);
+  border-bottom-color: var(--leaf);
+}
+
+/* Lessons List */
+.lessons-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+.lesson-item {
+  transition: all 0.3s ease;
+}
+
+.lesson-item:not(.locked):hover {
+  transform: translateX(4px);
+  box-shadow: var(--shadow-float);
+}
+
+.lesson-number {
+  width: 40px;
+  height: 40px;
+  border-radius: var(--round-full);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+}
+
+/* Lesson Content */
+.lesson-body {
+  line-height: 1.8;
+  color: var(--ink-dark);
+}
+
+.lesson-body h4 {
+  margin-top: var(--space-lg);
+  margin-bottom: var(--space-sm);
+  color: var(--ink-dark);
+}
+
+.lesson-body ul,
+.lesson-body ol {
+  padding-left: var(--space-lg);
+  margin-bottom: var(--space-md);
+}
+
+.lesson-body li {
+  margin-bottom: var(--space-xs);
+}
+
+.lesson-body code {
+  background: var(--dew-drop);
+  padding: 0.2rem 0.4rem;
+  border-radius: 4px;
+  font-family: 'Courier New', monospace;
+  font-size: 0.9em;
+}
+
+.lesson-body pre {
+  background: var(--ink-dark);
+  color: white;
+  padding: var(--space-md);
+  border-radius: var(--round-md);
+  overflow-x: auto;
+  margin-bottom: var(--space-md);
+}
+
+/* Exercises List */
+.exercises-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.exercise-item {
+  transition: all 0.3s ease;
+}
+
+.exercise-item:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-float);
+}
+
+/* Scenarios List */
+.scenarios-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.scenario-item {
+  transition: all 0.3s ease;
+}
+
+.scenario-item:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-float);
+}
