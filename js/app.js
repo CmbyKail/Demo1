@@ -6,7 +6,7 @@ import { Gamification } from './gamification.js';
 
 // 技能模块
 import { skillManager } from './modules/skills/SkillModuleManager.js';
-import { SkillModuleRenderer } from './modules/skills/SkillModuleRenderer.js';
+import { skillRenderer } from './modules/skills/SkillModuleRenderer.js';
 // import { HumorModule } from './modules/skills/HumorModule.js'; // TODO: Task 6创建后启用
 
 // DOM Elements
@@ -848,15 +848,19 @@ function renderRecommendation() {
  * 在欢迎页面的类别列表后插入技能卡片
  */
 async function initSkillModules() {
-    const renderer = new SkillModuleRenderer();
+    // 防止重复初始化
+    if (document.getElementById('skills-section')) {
+        console.log('Skill modules already initialized');
+        return;
+    }
 
-    // 在欢迎页面的类别列表后插入技能卡片
+    // 使用skillRenderer单例
     const categoryList = document.getElementById('category-list');
     if (categoryList) {
         const skillsSection = document.createElement('div');
         skillsSection.id = 'skills-section';
         categoryList.after(skillsSection);
-        renderer.renderSkillCards(skillsSection);
+        skillRenderer.renderSkillCards(skillsSection);
     }
 }
 
@@ -873,40 +877,75 @@ function showSkillModuleView(moduleId) {
         return;
     }
 
-    // 渲染技能模块界面（Task 4实现）
-    renderSkillModuleInterface(module);
+    // 使用skillRenderer单例渲染技能模块界面
+    skillRenderer.renderSkillModuleInterface(module);
 }
 
 /**
  * 显示理论课界面
  * @param {string} moduleId - 模块ID
  * @param {string} lessonId - 课程ID
+ *
+ * 注意: 理论课是技能模块界面的一个Tab,不是独立视图
+ * 该函数先打开模块界面,然后显示特定的课程内容
  */
 function showTheoryView(moduleId, lessonId) {
-    const lesson = skillManager.getLesson(moduleId, lessonId);
-    if (!lesson) return;
+    const module = skillManager.getModule(moduleId);
+    if (!module) {
+        console.error('Module not found:', moduleId);
+        return;
+    }
 
-    // 渲染理论课界面（Task 4实现）
-    renderTheoryInterface(lesson);
+    // 先渲染模块界面并切换到理论Tab
+    skillRenderer.renderSkillModuleInterface(module);
+    skillRenderer.currentTab = 'theory';
+    skillRenderer.renderTheoryTab(moduleId);
+
+    // TODO: 如果提供了lessonId,可以自动打开该课程详情
+    // if (lessonId) {
+    //     skillRenderer.showLessonContent(moduleId, lessonId);
+    // }
 }
 
 /**
  * 显示练习界面
  * @param {string} moduleId - 模块ID
  * @param {string} practiceType - 练习类型 ('quiz', 'scenario', 'reflection')
+ *
+ * 注意: 练习是技能模块界面的一个Tab,不是独立视图
  */
 function showPracticeView(moduleId, practiceType) {
-    // 渲染练习界面（Task 4实现）
-    renderPracticeInterface(moduleId, practiceType);
+    const module = skillManager.getModule(moduleId);
+    if (!module) {
+        console.error('Module not found:', moduleId);
+        return;
+    }
+
+    // 渲染模块界面并切换到练习Tab
+    skillRenderer.renderSkillModuleInterface(module);
+    skillRenderer.currentTab = 'practice';
+    skillRenderer.renderPracticeTab(moduleId);
+
+    // TODO: 根据practiceType过滤或高亮显示特定的练习
 }
 
 /**
  * 显示实战界面
  * @param {string} moduleId - 模块ID
+ *
+ * 注意: 实战是技能模块界面的一个Tab,不是独立视图
  */
 function showRealWorldView(moduleId) {
-    // 渲染实战界面（Task 4实现）
-    renderRealWorldInterface(moduleId);
+    const module = skillManager.getModule(moduleId);
+    if (!module) {
+        console.error('Module not found:', moduleId);
+        return;
+    }
+
+    // 渲染模块界面并切换到实战Tab
+    skillRenderer.renderSkillModuleInterface(module);
+    skillRenderer.currentTab = 'realworld';
+    skillRenderer.renderRealWorldTab(moduleId);
 }
 
 // Initialize on load
