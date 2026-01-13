@@ -5,8 +5,8 @@ import { Analytics } from './analytics.js';
 import { Gamification } from './gamification.js';
 
 // 技能模块
-import { SkillModuleManager } from './modules/skills/SkillModuleManager.js';
-// import { HumorModule } from './modules/skills/HumorModule.js'; // TODO: 待 Task 6 创建后启用
+// import { SkillModuleManager } from './modules/skills/SkillModuleManager.js'; // TODO: Task 3创建
+// import { HumorModule } from './modules/skills/HumorModule.js'; // TODO: Task 6创建后启用
 
 // DOM Elements
 const views = {
@@ -847,14 +847,9 @@ function renderRecommendation() {
  * @param {string} moduleId - 模块ID (如 'humor')
  */
 function showSkillModuleView(moduleId) {
-    const module = SkillModuleManager.getModule(moduleId);
-    if (!module) {
-        console.error('Module not found:', moduleId);
-        return;
-    }
-
-    // 渲染技能模块界面（将在 Task 4 实现具体的渲染逻辑）
-    renderSkillModuleInterface(module);
+    // TODO: Task 3 - 等待SkillModuleManager创建
+    console.log('showSkillModuleView called with moduleId:', moduleId);
+    alert('技能模块功能开发中... (Task 3完成)');
 }
 
 /**
@@ -863,14 +858,9 @@ function showSkillModuleView(moduleId) {
  * @param {string} lessonId - 课程ID
  */
 function showTheoryView(moduleId, lessonId) {
-    const lesson = SkillModuleManager.getLesson(moduleId, lessonId);
-    if (!lesson) {
-        console.error('Lesson not found:', moduleId, lessonId);
-        return;
-    }
-
-    // 渲染理论课界面（将在 Task 4 实现具体的渲染逻辑）
-    renderTheoryInterface(lesson);
+    // TODO: Task 3 - 等待SkillModuleManager创建
+    console.log('showTheoryView called with moduleId:', moduleId, 'lessonId:', lessonId);
+    alert('理论课功能开发中... (Task 3完成)');
 }
 
 /**
@@ -879,8 +869,9 @@ function showTheoryView(moduleId, lessonId) {
  * @param {string} practiceType - 练习类型 ('quiz', 'scenario', 'reflection')
  */
 function showPracticeView(moduleId, practiceType) {
-    // 渲染练习界面（将在 Task 4 实现具体的渲染逻辑）
-    renderPracticeInterface(moduleId, practiceType);
+    // TODO: Task 3 - 等待SkillModuleManager创建
+    console.log('showPracticeView called with moduleId:', moduleId, 'practiceType:', practiceType);
+    alert('练习功能开发中... (Task 3完成)');
 }
 
 /**
@@ -888,47 +879,9 @@ function showPracticeView(moduleId, practiceType) {
  * @param {string} moduleId - 模块ID
  */
 function showRealWorldView(moduleId) {
-    // 渲染实战界面（将在 Task 4 实现具体的渲染逻辑）
-    renderRealWorldInterface(moduleId);
-}
-
-// ==================== 技能模块渲染函数（占位符，Task 4 实现）====================
-
-/**
- * 渲染技能模块主界面
- * TODO: Task 4 - 实现具体的DOM渲染逻辑
- */
-function renderSkillModuleInterface(module) {
-    console.log('Rendering skill module interface for:', module.id);
-    // Task 4 将实现完整的UI渲染
-    // 目前先输出日志作为占位符
-}
-
-/**
- * 渲染理论课界面
- * TODO: Task 4 - 实现具体的DOM渲染逻辑
- */
-function renderTheoryInterface(lesson) {
-    console.log('Rendering theory interface for lesson:', lesson.id);
-    // Task 4 将实现完整的UI渲染
-}
-
-/**
- * 渲染练习界面
- * TODO: Task 4 - 实现具体的DOM渲染逻辑
- */
-function renderPracticeInterface(moduleId, practiceType) {
-    console.log('Rendering practice interface:', moduleId, practiceType);
-    // Task 4 将实现完整的UI渲染
-}
-
-/**
- * 渲染实战界面
- * TODO: Task 4 - 实现具体的DOM渲染逻辑
- */
-function renderRealWorldInterface(moduleId) {
-    console.log('Rendering real-world interface:', moduleId);
-    // Task 4 将实现完整的UI渲染
+    // TODO: Task 3 - 等待SkillModuleManager创建
+    console.log('showRealWorldView called with moduleId:', moduleId);
+    alert('实战功能开发中... (Task 3完成)');
 }
 
 // Initialize on load
