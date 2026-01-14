@@ -4,12 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>情商训练营 (EQ Trainer)</title>
-    <!-- Fonts: Fredoka (Headings) & Nunito (Body) -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@300;400;500;600;700&family=Nunito:wght@300;400;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="css/style.css">
-    <link rel="stylesheet" href="css/skills.css">
+    <!-- Fonts: Fredoka (Headings) & Nunito (Body) - Using loli.net mirror for China access -->
+    <link rel="preconnect" href="https://fonts.loli.net">
+    <link rel="preconnect" href="https://gstatic.loli.net" crossorigin>
+    <link href="https://fonts.loli.net/css2?family=Fredoka:wght@300;400;500;600;700&family=Nunito:wght@300;400;600;700;800&display=swap&v=20260114" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css?v=20260114">
+    <link rel="stylesheet" href="css/skills.css?v=20260114">
     <!-- Chart.js (Local) -->
     <script src="js/chart.js"></script>
 </head>
@@ -29,6 +29,14 @@
             <div class="hero-section" style="text-align: center; margin-bottom: 3rem;">
                 <h2 style="font-size: 2rem; color: var(--primary-color); margin-bottom: 0.5rem;">开启你的情商之旅</h2>
                 <p style="color: var(--text-light); margin-bottom: 2rem;">选择一个场景，开始今天的修炼</p>
+
+                <!-- 技能训练入口 -->
+                <div style="margin-bottom: 2rem;">
+                    <button id="skills-training-btn" class="primary-btn" style="padding: 1rem 2rem; font-size: 1.1rem; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                        📚 技能训练系统
+                    </button>
+                </div>
+
                 <div id="category-list" class="grid-container">
                     <!-- 动态生成 -->
                 </div>
@@ -119,6 +127,24 @@
             <div class="history-summary">
                 <h3>历史记录</h3>
                 <ul id="history-list"></ul>
+            </div>
+        </section>
+
+        <!-- 技能模块界面 -->
+        <section id="skills-view" class="view hidden">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+                <h2 style="font-size: 1.8rem; color: var(--primary-color);">📚 技能训练系统</h2>
+                <button id="back-to-home-from-skills-btn" class="secondary-btn">← 返回主页</button>
+            </div>
+
+            <!-- 技能模块列表 -->
+            <div id="skills-modules-container" class="skills-modules-container">
+                <!-- 动态生成 -->
+            </div>
+
+            <!-- 技能内容区域 (理论课/练习/实战) -->
+            <div id="skill-content-area" class="hidden">
+                <!-- 由 SkillModuleRenderer 动态渲染 -->
             </div>
         </section>
 
@@ -297,6 +323,13 @@
         </div>
     </div>
 
-    <script type="module" src="js/app.js?v=4"></script>
+    <!-- 技能模块系统 -->
+    <script type="module" src="js/modules/skills/HumorModule.js"></script>
+    <script type="module" src="js/modules/skills/PracticeEngine.js"></script>
+    <script type="module" src="js/modules/skills/DialogueEngine.js"></script>
+    <script type="module" src="js/modules/skills/SkillModuleRenderer.js"></script>
+    <script type="module" src="js/modules/skills/SkillModuleManager.js"></script>
+
+    <script type="module" src="js/app.js?v=6"></script>
 </body>
 </html>

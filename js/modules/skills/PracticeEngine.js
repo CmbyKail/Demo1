@@ -69,7 +69,7 @@ export class PracticeEngine {
 
           <h2 style="margin-bottom:var(--space-sm);">${this.escapeHtml(exercise.title)}</h2>
           <p style="color:var(--ink-light);margin-bottom:var(--space-lg);">
-            ${this.escapeHtml(exercise.description)}
+            ${this.escapeHtml(exercise.description || exercise.prompt)}
           </p>
 
           ${exercise.scenario ? `

@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>诊断页面 - 情商训练营</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .test-item {
+            background: white;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 8px;
+            border-left: 4px solid #ddd;
+        }
+        .test-item.pass { border-left-color: #4CAF50; }
+        .test-item.fail { border-left-color: #f44336; }
+        .test-item.warn { border-left-color: #ff9800; }
+        h2 { color: #333; }
+        code {
+            background: #f0f0f0;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: monospace;
+        }
+        button {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 5px;
+        }
+        button:hover { background: #5568d3; }
+    </style>
+</head>
+<body>
+    <h1>🔍 情商训练营 - 诊断工具</h1>
+
+    <div id="results"></div>
+
+    <script>
+        const results = document.getElementById('results');
+
+        function addTest(name, passed, message) {
+            const div = document.createElement('div');
+            div.className = `test-item ${passed ? 'pass' : 'fail'}`;
+            div.innerHTML = `
+                <strong>${passed ? '✅' : '❌'} ${name}</strong>
+                <p>${message}</p>
+            `;
+            results.appendChild(div);
+        }
+
+        function runTests() {
+            results.innerHTML = '<h2>诊断结果:</h2>';
+
+            // 测试 1: 检查技能按钮
+            const skillsBtn = document.getElementById('skills-training-btn');
+            if (skillsBtn) {
+                addTest('技能按钮存在', true, `按钮元素已找到: <code>${skillsBtn.outerHTML.substring(0, 100)}...</code>`);
+            } else {
+                addTest('技能按钮存在', false, '在 index.html 中找不到 id="skills-training-btn" 的元素');
+            }
+
+            // 测试 2: 检查技能视图
+            const skillsView = document.getElementById('skills-view');
+            if (skillsView) {
+                addTest('技能视图存在', true, '技能视图 section 已找到');
+            } else {
+                addTest('技能视图存在', false, '在 index.html 中找不到 id="skills-view" 的元素');
+            }
+
+            // 测试 3: 检查 JS 文件引入
+            const scripts = Array.from(document.querySelectorAll('script'));
+            const skillScripts = scripts.filter(s =>
+                s.src && s.src.includes('modules/skills')
+            );
+
+            if (skillScripts.length > 0) {
+                addTest('技能模块JS引入', true, `找到 ${skillScripts.length} 个技能模块脚本:
+                    <br>${skillScripts.map(s => `<code>${s.src.split('/').pop()}</code>`).join(', ')}`);
+            } else {
+                addTest('技能模块JS引入', false, '没有找到任何技能模块的脚本引入');
+            }
+
+            // 测试 4: 检查 app.js 版本
+            const appScript = scripts.find(s => s.src && s.src.includes('app.js'));
+            if (appScript) {
+                const hasVersion = appScript.src.includes('?v=');
+                addTest('app.js版本控制', hasVersion,
+                    hasVersion
+                        ? `当前版本: <code>${appScript.src}</code>`
+                        : 'app.js 没有版本号，可能被缓存');
+            } else {
+                addTest('app.js引入', false, '找不到 app.js');
+            }
+
+            // 测试 5: 检查模块容器
+            const container = document.getElementById('skills-modules-container');
+            if (container) {
+                addTest('技能模块容器', true, '容器元素已找到');
+            } else {
+                addTest('技能模块容器', false, '找不到 id="skills-modules-container" 的容器');
+            }
+
+            // 测试 6: 测试 fetch
+            addTest('网络请求测试', true, '尝试加载 server_data.json...');
+            fetch('/server_data.json')
+                .then(r => r.json())
+                .then(data => {
+                    const hasModules = data.skillModules && Object.keys(data.skillModules).length > 0;
+                    if (hasModules) {
+                        addTest('技能模块数据', true, `找到 ${Object.keys(data.skillModules).length} 个模块:
+                            <br>${Object.keys(data.skillModules).map(k => `<code>${k}</code>`).join(', ')}`);
+                    } else {
+                        addTest('技能模块数据', false, 'server_data.json 中没有 skillModules 数据');
+                    }
+                })
+                .catch(err => {
+                    addTest('技能模块数据', false, `无法加载 server_data.json: ${err.message}`);
+                });
+        }
+
+        // 页面加载后运行测试
+        window.addEventListener('DOMContentLoaded', () => {
+            setTimeout(runTests, 100);
+        });
+
+        // 添加手动刷新按钮
+        const btn = document.createElement('button');
+        btn.textContent = '🔄 重新运行诊断';
+        btn.onclick = runTests;
+        results.appendChild(btn);
+    </script>
+</body>
+</html>

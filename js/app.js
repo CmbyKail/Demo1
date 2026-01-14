@@ -13,7 +13,8 @@ import { HumorModule } from './modules/skills/HumorModule.js';
 const views = {
     welcome: document.getElementById('welcome-view'),
     training: document.getElementById('training-view'),
-    feedback: document.getElementById('feedback-view')
+    feedback: document.getElementById('feedback-view'),
+    skills: document.getElementById('skills-view')
 };
 
 const elements = {
@@ -314,6 +315,17 @@ function bindEvents() {
 
     document.getElementById('send-chat-btn').addEventListener('click', handleChatSend);
     document.getElementById('end-chat-btn').addEventListener('click', endChat);
+
+    // 技能模块按钮
+    const skillsTrainingBtn = document.getElementById('skills-training-btn');
+    if (skillsTrainingBtn) {
+        skillsTrainingBtn.addEventListener('click', showSkillsView);
+    }
+
+    const backToHomeFromSkillsBtn = document.getElementById('back-to-home-from-skills-btn');
+    if (backToHomeFromSkillsBtn) {
+        backToHomeFromSkillsBtn.addEventListener('click', () => switchView('welcome'));
+    }
 }
 
 function updateFavoriteBtn(isFav) {
@@ -384,6 +396,9 @@ function showView(viewName, viewData = {}) {
             console.warn('Unknown view:', viewName);
     }
 }
+
+// 导出为全局函数，供技能模块系统使用
+window.showView = showView;
 
 function cancelScenario() {
     const hasContent = elements.userAnswer.value.trim().length > 0;
@@ -865,6 +880,30 @@ async function initSkillModules() {
 }
 
 // ==================== 技能模块视图函数 ====================
+
+/**
+ * 显示技能模块列表视图
+ */
+function showSkillsView() {
+    // 隐藏所有视图
+    document.querySelectorAll('.view').forEach(v => {
+        v.classList.remove('active');
+        v.classList.add('hidden');
+    });
+
+    // 显示技能模块视图
+    const skillsView = document.getElementById('skills-view');
+    if (skillsView) {
+        skillsView.classList.remove('hidden');
+        skillsView.classList.add('active');
+
+        // 渲染技能模块列表
+        const container = document.getElementById('skills-modules-container');
+        if (container) {
+            skillRenderer.renderSkillCards(container);
+        }
+    }
+}
 
 /**
  * 显示技能模块主界面

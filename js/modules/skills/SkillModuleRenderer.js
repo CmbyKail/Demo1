@@ -128,6 +128,9 @@ class SkillModuleRenderer {
       return;
     }
 
+    // 清空容器
+    container.innerHTML = '';
+
     const grid = document.createElement('div');
     grid.className = 'skills-grid';
     grid.innerHTML = modules.map(module => this.renderSkillCard(module)).join('');
@@ -305,8 +308,32 @@ class SkillModuleRenderer {
       // 处理返回按钮
       if (e.target.closest('#back-to-skills-btn')) {
         e.preventDefault();
-        if (typeof switchView === 'function') {
-          switchView('welcome');
+        
+        // 隐藏当前模块视图
+        const moduleView = document.getElementById('skill-module-view');
+        if (moduleView) {
+          moduleView.classList.add('hidden');
+          moduleView.classList.remove('active');
+        }
+
+        // 重新渲染技能列表
+        const container = document.getElementById('skills-modules-container');
+        if (container) {
+          this.renderSkillCards(container);
+        }
+
+        // 切换到技能列表视图
+        if (typeof window.showView === 'function') {
+          window.showView('skills');
+        } else if (typeof switchView === 'function') {
+          switchView('skills');
+        } else {
+          // 降级处理
+          const skillsView = document.getElementById('skills-view');
+          if (skillsView) {
+            skillsView.classList.remove('hidden');
+            skillsView.classList.add('active');
+          }
         }
         return;
       }
@@ -550,7 +577,7 @@ class SkillModuleRenderer {
             </div>
             <h4 style="margin-bottom:var(--space-xs);">${this.escapeHtml(exercise.title)}</h4>
             <p style="color:var(--ink-light);font-size:0.9rem;">
-              ${this.escapeHtml(exercise.description || '点击开始练习')}
+              ${this.escapeHtml(exercise.description || exercise.prompt || '点击开始练习')}
             </p>
           </div>
         `).join('')}
