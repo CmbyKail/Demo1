@@ -464,7 +464,9 @@ button {
     display: flex;
     flex-direction: column;
     align-items: center;
+    justify-content: space-between; /* 确保垂直方向分布均匀 */
     height: 100%;
+    min-height: 240px; /* 强制最小高度，确保所有卡片高度一致 */
     position: relative;
     transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
     overflow: hidden;
@@ -494,6 +496,12 @@ button {
 .category-card:nth-child(6) {
     background: linear-gradient(145deg, #fff 0%, #E0F7FA 100%);
 }
+
+/* 技能专属渐变 (复用 category-card 样式) */
+.category-card.skill-card:nth-child(1) { background: linear-gradient(145deg, #fff 0%, #FFF3E0 100%); } /* Humor - Orange */
+.category-card.skill-card:nth-child(2) { background: linear-gradient(145deg, #fff 0%, #FCE4EC 100%); } /* Retaliation - Pink */
+.category-card.skill-card:nth-child(3) { background: linear-gradient(145deg, #fff 0%, #E3F2FD 100%); } /* Influence - Blue */
+.category-card.skill-card:nth-child(4) { background: linear-gradient(145deg, #fff 0%, #E8F5E9 100%); } /* Anti-PUA - Green */
 
 /* 装饰性叶子 */
 .category-card::after {

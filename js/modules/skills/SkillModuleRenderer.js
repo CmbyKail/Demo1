@@ -4,9 +4,9 @@
  * 技能模块UI渲染器
  * 负责渲染技能模块相关的所有界面
  */
-import { skillManager } from './SkillModuleManager.js';
-import { PracticeEngine } from './PracticeEngine.js';
 import { DialogueEngine } from './DialogueEngine.js';
+import { PracticeEngine } from './PracticeEngine.js';
+import { skillManager } from './SkillModuleManager.js';
 
 class SkillModuleRenderer {
   constructor() {
@@ -128,17 +128,11 @@ class SkillModuleRenderer {
       return;
     }
 
-    // 清空容器
-    container.innerHTML = '';
+    // 直接渲染卡片并插入容器，不再创建额外的 grid-container 嵌套
+    container.innerHTML = modules.map(module => this.renderSkillCard(module)).join('');
 
-    const grid = document.createElement('div');
-    grid.className = 'skills-grid';
-    grid.innerHTML = modules.map(module => this.renderSkillCard(module)).join('');
-
-    container.appendChild(grid);
-
-    // 附加事件
-    this.attachSkillCardEvents(grid);
+    // 附加事件 (直接在容器上监听即可)
+    this.attachSkillCardEvents(container);
   }
 
   /**
@@ -156,17 +150,14 @@ class SkillModuleRenderer {
     // 根据模块ID设置样式类
     const skillClass = `skill-${module.id}`;
 
+    // 使用 category-card 样式结构
     return `
-      <div class="skill-card ${skillClass}" data-module-id="${module.id}">
-        <div class="skill-icon">${module.icon}</div>
-        <h3 class="skill-name">${module.name}</h3>
-        <p class="skill-level">Lv.${level}</p>
-        <div class="skill-progress">
-          <div class="skill-progress-fill" style="width: ${progressPercent}%"></div>
-        </div>
-        <p style="font-size:0.8rem;color:var(--ink-light);margin-top:0.5rem;">
-          ${completedCount}/${totalLessons} 课
-        </p>
+      <div class="category-card skill-card ${skillClass}" data-module-id="${module.id}">
+        <span class="category-icon">${module.icon}</span>
+        <h4>${module.name}</h4>
+        <span class="start-tag">开始练习</span>
+        <!-- 隐藏的进度信息，保留数据属性供调试 -->
+        <div class="skill-meta hidden" data-level="${level}" data-progress="${progressPercent}"></div>
       </div>
     `;
   }
@@ -177,6 +168,7 @@ class SkillModuleRenderer {
    */
   attachSkillCardEvents(container) {
     container.addEventListener('click', (e) => {
+      // 查找最近的 .skill-card (同时也拥有 .category-card 类)
       const card = e.target.closest('.skill-card');
       if (card) {
         const moduleId = card.dataset.moduleId;
@@ -244,7 +236,7 @@ class SkillModuleRenderer {
     moduleView.innerHTML = `
       <div class="clay-card" style="margin-bottom: var(--space-lg);">
         <button id="back-to-skills-btn" class="neutral-btn small" style="margin-bottom: var(--space-md);">
-          ← 返回技能列表
+          ← 返回
         </button>
         <div style="display:flex;align-items:center;gap:var(--space-md);margin-bottom:var(--space-md);">
           <span style="font-size:3rem;">${module.icon}</span>
@@ -316,23 +308,23 @@ class SkillModuleRenderer {
           moduleView.classList.remove('active');
         }
 
-        // 重新渲染技能列表
-        const container = document.getElementById('skills-modules-container');
-        if (container) {
-          this.renderSkillCards(container);
-        }
+        // 重新渲染技能列表 (已移除，避免清空 category-list)
+        // const container = document.getElementById('skills-modules-container');
+        // if (container) {
+        //   this.renderSkillCards(container);
+        // }
 
-        // 切换到技能列表视图
+        // 切换回主页 (技能列表在主页)
         if (typeof window.showView === 'function') {
-          window.showView('skills');
+          window.showView('welcome');
         } else if (typeof switchView === 'function') {
-          switchView('skills');
+          switchView('welcome');
         } else {
           // 降级处理
-          const skillsView = document.getElementById('skills-view');
-          if (skillsView) {
-            skillsView.classList.remove('hidden');
-            skillsView.classList.add('active');
+          const welcomeView = document.getElementById('welcome-view');
+          if (welcomeView) {
+            welcomeView.classList.remove('hidden');
+            welcomeView.classList.add('active');
           }
         }
         return;
@@ -760,3 +752,4 @@ class SkillModuleRenderer {
 // 导出单例
 export const skillRenderer = new SkillModuleRenderer();
 export { SkillModuleRenderer };
+

@@ -1,20 +1,19 @@
-import { analyzeResponse, generateSimilarScenario, chatWithPersona } from './ai-service.js';
-import { getAllCategories, getRandomScenario, getScenarioById, getAllScenarios } from './scenarios.js';
-import { getHistory, getSettings, initStorage, isFavorite, saveCustomScenario, saveHistory, saveSettings, toggleFavorite } from './storage.js';
+import { analyzeResponse, chatWithPersona, generateSimilarScenario } from './ai-service.js';
 import { Analytics } from './analytics.js';
 import { Gamification } from './gamification.js';
+import { getAllCategories, getAllScenarios, getRandomScenario } from './scenarios.js';
+import { getHistory, getSettings, initStorage, isFavorite, saveCustomScenario, saveHistory, saveSettings, toggleFavorite } from './storage.js';
 
 // 技能模块
 import { skillManager } from './modules/skills/SkillModuleManager.js';
 import { skillRenderer } from './modules/skills/SkillModuleRenderer.js';
-import { HumorModule } from './modules/skills/HumorModule.js';
 
 // DOM Elements
 const views = {
     welcome: document.getElementById('welcome-view'),
     training: document.getElementById('training-view'),
     feedback: document.getElementById('feedback-view'),
-    skills: document.getElementById('skills-view')
+    skills: document.getElementById('skills-view') // 已移除，保留占位或删除
 };
 
 const elements = {
@@ -79,27 +78,39 @@ let chatHistory = [];
 async function init() {
     await initStorage();
     await skillManager.loadModules();
-    renderCategories();
+    
+    // 1. 先清空容器
+    elements.categoryList.innerHTML = '';
+    
+    // 2. 渲染技能卡片 (在前)
+    await initSkillModules();
+    
+    // 3. 渲染场景分类 (在后)
+    appendCategories(); // 新函数，替代原 renderCategories
+    
     renderHistory();
     renderContributionGraph();
     renderGamification();
     renderStats();
     renderRecommendation();
     setupDailyChallenge();
-    initSkillModules();
     bindEvents();
 }
 
-function renderCategories() {
+function appendCategories() {
     const categories = getAllCategories();
-    elements.categoryList.innerHTML = categories.map(cat => `
+    const categoryHtml = categories.map(cat => `
         <div class="category-card" data-id="${cat.id}">
             <span class="category-icon">${cat.icon}</span>
             <h4>${cat.name}</h4>
             <span class="start-tag">开始练习</span>
         </div>
     `).join('');
+    
+    // 追加到容器
+    elements.categoryList.insertAdjacentHTML('beforeend', categoryHtml);
 }
+
 
 function renderHistory() {
     const history = getHistory();
@@ -122,7 +133,8 @@ function bindEvents() {
     // Category Selection
     elements.categoryList.addEventListener('click', (e) => {
         const card = e.target.closest('.category-card');
-        if (card) {
+        // 忽略技能卡片，只处理普通场景卡片
+        if (card && !card.classList.contains('skill-card')) {
             startScenario(card.dataset.id);
         }
     });
@@ -285,7 +297,9 @@ function bindEvents() {
             elements.customDesc.value = '';
             elements.customContext.value = '';
             // Refresh categories
-            renderCategories();
+            elements.categoryList.innerHTML = '';
+            initSkillModules();
+            appendCategories();
         } else {
             alert('保存失败，请重试');
         }
@@ -316,16 +330,7 @@ function bindEvents() {
     document.getElementById('send-chat-btn').addEventListener('click', handleChatSend);
     document.getElementById('end-chat-btn').addEventListener('click', endChat);
 
-    // 技能模块按钮
-    const skillsTrainingBtn = document.getElementById('skills-training-btn');
-    if (skillsTrainingBtn) {
-        skillsTrainingBtn.addEventListener('click', showSkillsView);
-    }
-
-    const backToHomeFromSkillsBtn = document.getElementById('back-to-home-from-skills-btn');
-    if (backToHomeFromSkillsBtn) {
-        backToHomeFromSkillsBtn.addEventListener('click', () => switchView('welcome'));
-    }
+    // 技能模块按钮监听器已移除
 }
 
 function updateFavoriteBtn(isFav) {
@@ -357,15 +362,24 @@ function showHistoryDetail(index) {
 }
 
 function switchView(viewName) {
-    Object.values(views).forEach(el => el.classList.remove('active'));
-    Object.values(views).forEach(el => el.classList.add('hidden'));
+    Object.values(views).forEach(el => {
+        if (el) {
+            el.classList.remove('active');
+            el.classList.add('hidden');
+        }
+    });
 
-    views[viewName].classList.remove('hidden');
-    views[viewName].classList.add('active');
+    if (views[viewName]) {
+        views[viewName].classList.remove('hidden');
+        views[viewName].classList.add('active');
+    }
 
     if (viewName === 'welcome') {
         renderHistory();
-        renderCategories();
+        // 清空列表，防止重复添加
+        elements.categoryList.innerHTML = '';
+        initSkillModules(); 
+        appendCategories();
         renderContributionGraph();
     }
 }
@@ -655,13 +669,15 @@ function renderStats() {
     // Render Radar
     if (typeof Chart !== 'undefined') {
         const radarData = analytics.getRadarData();
+        console.log('Chart Data (v3):', radarData);
+
         const canvas = document.getElementById('ability-radar');
         if (!canvas) return;
         
         const ctx = canvas.getContext('2d');
         
         if (radarChart) radarChart.destroy();
-        
+
         radarChart = new Chart(ctx, {
             type: 'radar',
             data: radarData,
@@ -669,17 +685,34 @@ function renderStats() {
                 scales: {
                     r: {
                         beginAtZero: true,
+                        min: 0,
                         max: 100,
-                        ticks: { display: false },
+                        ticks: {
+                            display: false,
+                            stepSize: 20
+                        },
+                        grid: {
+                            color: 'rgba(0, 0, 0, 0.1)'
+                        },
+                        angleLines: {
+                            color: 'rgba(0, 0, 0, 0.1)'
+                        },
                         pointLabels: {
-                            font: { size: 10, family: "'Nunito', sans-serif" }
+                            font: {
+                                size: 12,
+                                family: "'Noto Sans SC', sans-serif"
+                            },
+                            color: '#2C3E50'
                         }
                     }
                 },
                 plugins: {
-                    legend: { display: false }
+                    legend: {
+                        display: false
+                    }
                 },
-                maintainAspectRatio: false
+                maintainAspectRatio: false,
+                responsive: true
             }
         });
     }
@@ -860,50 +893,24 @@ function renderRecommendation() {
 
 /**
  * 初始化技能模块
- * 在欢迎页面的类别列表后插入技能卡片
+ * 直接渲染到统一的 category-list 容器中
  */
 async function initSkillModules() {
-    // 防止重复初始化
-    if (document.getElementById('skills-section')) {
-        console.log('Skill modules already initialized');
-        return;
-    }
-
-    // 使用skillRenderer单例
-    const categoryList = document.getElementById('category-list');
-    if (categoryList) {
-        const skillsSection = document.createElement('div');
-        skillsSection.id = 'skills-section';
-        categoryList.after(skillsSection);
-        skillRenderer.renderSkillCards(skillsSection);
+    // 容器复用 category-list
+    const container = document.getElementById('category-list');
+    if (container) {
+        // 使用 append 模式，或者由 init() 控制清空
+        // 这里 SkillRenderer 默认是 innerHTML=''，所以需要在 appendCategories 之前调用
+        skillRenderer.renderSkillCards(container);
     }
 }
 
 // ==================== 技能模块视图函数 ====================
 
 /**
- * 显示技能模块列表视图
+ * showSkillsView 已移除，直接在主页显示
  */
-function showSkillsView() {
-    // 隐藏所有视图
-    document.querySelectorAll('.view').forEach(v => {
-        v.classList.remove('active');
-        v.classList.add('hidden');
-    });
 
-    // 显示技能模块视图
-    const skillsView = document.getElementById('skills-view');
-    if (skillsView) {
-        skillsView.classList.remove('hidden');
-        skillsView.classList.add('active');
-
-        // 渲染技能模块列表
-        const container = document.getElementById('skills-modules-container');
-        if (container) {
-            skillRenderer.renderSkillCards(container);
-        }
-    }
-}
 
 /**
  * 显示技能模块主界面

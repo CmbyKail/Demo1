@@ -1,5 +1,5 @@
-import { getHistory } from './storage.js';
 import { getAllCategories, getScenarioById } from './scenarios.js';
+import { getHistory } from './storage.js';
 
 export class Analytics {
     constructor() {
@@ -112,21 +112,37 @@ export class Analytics {
     // Prepare data for Chart.js
     getRadarData() {
         const stats = this.getCategoryStats();
-        // Filter out 'custom' or 'favorites' if they are not main abilities
-        // For EQ model, we usually care about the core dimensions
-        const coreCategories = ['work', 'emotion', 'social', 'conflict']; 
+        // 使用实际存在的分类 ID (与 scenarios.js 保持一致)
+        const coreCategories = ['职场', '情感', '社交', '冲突化解']; 
         
         const labels = [];
         const data = [];
 
+        // 检查是否有任何分类匹配
+        let hasAnyData = false;
         coreCategories.forEach(id => {
-            if (stats[id]) {
-                labels.push(stats[id].name);
-                data.push(stats[id].average || 0); // Use 0 if no data
-            }
+            // 查找统计数据中对应的分类
+            // stats 对象的键是分类名称/ID
+            const catStat = stats[id];
+            
+            labels.push(id); // 直接使用预定义的维度名称
+            const score = catStat ? (catStat.average || 0) : 0;
+            data.push(score);
+            if (score > 0) hasAnyData = true;
         });
 
-        // Add 'Other' if significant? No, keep it clean for Radar.
+        // 如果没有数据，且 labels 为空（极端情况），补全默认维度
+        if (labels.length === 0) {
+            ['职场', '情感', '社交', '冲突'].forEach(l => {
+                labels.push(l);
+                data.push(10);
+            });
+        } else if (!hasAnyData) {
+            // 填充一个小基础值
+            for (let i = 0; i < data.length; i++) {
+                data[i] = 10; 
+            }
+        }
 
         return {
             labels,
@@ -134,12 +150,12 @@ export class Analytics {
                 label: '能力维度',
                 data: data,
                 fill: true,
-                backgroundColor: 'rgba(79, 70, 229, 0.2)',
-                borderColor: 'rgb(79, 70, 229)',
-                pointBackgroundColor: 'rgb(249, 115, 22)',
+                backgroundColor: 'rgba(76, 175, 80, 0.2)', // 使用主题绿色
+                borderColor: 'rgba(76, 175, 80, 0.8)',
+                pointBackgroundColor: 'rgb(255, 152, 0)', // 橙色点缀
                 pointBorderColor: '#fff',
                 pointHoverBackgroundColor: '#fff',
-                pointHoverBorderColor: 'rgb(249, 115, 22)'
+                pointHoverBorderColor: 'rgb(255, 152, 0)'
             }]
         };
     }
